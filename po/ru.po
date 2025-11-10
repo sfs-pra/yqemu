@@ -1,0 +1,94 @@
+# Russian translations for yqemu-img package.
+# Copyright (C) 2024 THE yqemu-img'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the yqemu-img package.
+# Automatically generated, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yqemu-img 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 12:00+0300\n"
+"PO-Revision-Date: 2024-01-01 12:00+0300\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "Create Image"
+msgstr "Создать образ"
+
+msgid "Enter image name (with full path, without extension):"
+msgstr "Введите имя образа (с полным путем, без расширения):"
+
+msgid "Image name cannot be empty."
+msgstr "Имя образа не может быть пустым."
+
+msgid "Create .qcow2 Image"
+msgstr "Создать образ .qcow2"
+
+msgid "Enter image size (e.g., 10G):"
+msgstr "Введите размер образа (например, 10G):"
+
+msgid "Image size cannot be empty."
+msgstr "Размер образа не может быть пустым."
+
+msgid "Image %s.qcow2 created successfully."
+msgstr "Образ %s.qcow2 создан успешно."
+
+msgid "Error creating image."
+msgstr "Ошибка при создании образа."
+
+msgid "Select Source Image"
+msgstr "Выберите исходный образ"
+
+msgid "Source image not selected."
+msgstr "Исходный образ не выбран."
+
+msgid "Convert Image"
+msgstr "Конвертировать образ"
+
+msgid "Enter new image name:"
+msgstr "Введите имя нового образа:"
+
+msgid "New image name cannot be empty."
+msgstr "Имя нового образа не может быть пустым."
+
+msgid "Image %s converted to %s."
+msgstr "Образ %s конвертирован в %s."
+
+msgid "Error converting image."
+msgstr "Ошибка при конвертации образа."
+
+msgid "Select Image"
+msgstr "Выберите образ"
+
+msgid "Image %s deleted."
+msgstr "Образ %s удален."
+
+msgid "Error deleting image."
+msgstr "Ошибка при удалении образа."
+
+msgid "Information about %s"
+msgstr "Информация о %s"
+
+msgid "Error getting information."
+msgstr "Ошибка при получении информации."
+
+msgid "<b>qcow2 HDD Image</b>"
+msgstr "<b>Имидж HDD qcow2</b>"
+
+msgid "Create"
+msgstr "Создать"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Information"
+msgstr "Информация"
+
+msgid "Unknown action."
+msgstr "Неизвестное действие."
