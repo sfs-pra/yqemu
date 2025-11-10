@@ -1,0 +1,210 @@
+#!/bin/bash
+#250514 sfs
+# Директория для хранения конфигурационных файлов
+CONFIG_DIR="$HOME/.config/qemu-configs"
+yad --version |grep -E '^0' && gtk=gtk || gtk=yad
+# Создание директории, если она не существует
+mkdir -p "$CONFIG_DIR"
+
+def(){
+    qcow2_path=""
+    memory="2048"
+    cpu_cores="`nproc`" ; [ "$cpu_cores" ] || cpu_cores=1
+    sound_device="AC97-alsa"
+}
+qemu_command="qemu-system-`uname -m` \
+-enable-kvm -boot dc \
+-machine q35,accel=kvm:tcg"
+#-device virtio-vga-gl 
+##-device virtio-gpu
+#    -display sdl,gl=on 
+##    -display gtk,gl=on 
+
+# Функция для запуска QEMU
+run_qemu() {
+    local iso_path="$1"
+    local qcow2_path="$2"
+    local memory="$3"
+    local cpu_cores="$4"
+    local sound_device="$5"
+    local efi="$6"
+
+    [ -n "$memory" ] &&		qemu_command+=" -m $memory"
+    [ -n "$cpu_cores" ] &&	qemu_command+=" -smp $cpu_cores"
+    [ -n "$iso_path" ] &&	qemu_command+=" -cdrom $iso_path"
+    if [ -n "$qcow2_path" ]; then
+        qemu_command+=" -drive file=$qcow2_path,format=qcow2"
+    fi
+
+    if [ "$sound_device" == "AC97-alsa" ]; then
+#        qemu_command+=" -device AC97"
+        qemu_command+=" -audiodev alsa,id=audio0 -device AC97,audiodev=audio0"
+    elif [ "$sound_device" == "AC97-pulse" ]; then
+        qemu_command+=" -audiodev pa,id=audio0 -device AC97,audiodev=audio0"
+    elif [ "$sound_device" == "virtio-sound-pci-alsa" ]; then
+        qemu_command+=" -device virtio-sound-pci,audiodev=my_audiodev -audiodev alsa,id=my_audiodev"
+    elif [ "$sound_device" == "virtio-sound-pci-pulse" ]; then
+        qemu_command+=" -device virtio-sound-pci,audiodev=my_audiodev -audiodev pa,id=my_audiodev"
+    fi
+    [ "$efi" = TRUE ] && qemu_command+=" -drive if=pflash,format=raw,readonly=on,file=/usr/share/edk2/x64/OVMF_CODE.4m.fd"
+    echo $qemu_command
+    output=$(eval $qemu_command 2>&1)
+#    output=$(bash -c "$file" 2>&1)
+    exit_code=$?
+    # Проверяем код выхода
+    [ $exit_code -ne 0 ] && yad --text="Ошибка выполнения:\n$output" \
+	--button=$gtk-ok:0 \
+        --window-icon="qemu" \
+        --name="qemu" \
+	 --width=400 --Xheight=300 --title="yQEMU"
+    exec "$0" &
+    exit
+}
+
+# Функция для сохранения конфигурации
+save_config() {
+    local config_file="$1"
+    local iso_path="$2"
+    local qcow2_path="$3"
+    local memory="$4"
+    local cpu_cores="$5"
+    local sound_device="$6"
+    local efi="$7"
+    local qemu_command="$8"
+
+    echo "ISO Path: $iso_path" > "$config_file"
+    echo "QCOW2 Path: $qcow2_path" >> "$config_file"
+    echo "Memory (MB): $memory" >> "$config_file"
+    echo "CPU Cores: $cpu_cores" >> "$config_file"
+    echo "Sound: $sound_device" >> "$config_file"
+    echo "EFI: $efi" >> "$config_file"
+    echo "Other: $qemu_command" >> "$config_file"
+}
+
+# Функция для загрузки конфигурации
+load_config() {
+    local config_file="$1"
+    if [ -f "$config_file" ]; then
+        iso_path=$(grep "ISO Path:" "$config_file" | awk '{print $3}')
+        qcow2_path=$(grep "QCOW2 Path:" "$config_file" | awk '{print $3}')
+        memory=$(grep "Memory (MB):" "$config_file" | awk '{print $3}')
+	#"
+        cpu_cores=$(grep "CPU Cores:" "$config_file" | awk '{print $3}')
+        sound_device=$(grep "Sound:" "$config_file" | awk '{print $2}')
+        efi=$(grep "EFI:" "$config_file" | awk '{print $2}')
+        qemu_command=$(grep -E '^Other: ' "$config_file"  |sed  's/Other: //')
+    else
+	def
+    fi
+}
+
+# Разбор параметров
+razb(){
+    iso_path=$(echo "$params" | awk -F'|' '{print $2}')
+    qcow2_path=$(echo "$params" | awk -F'|' '{print $3}')
+    memory=$(echo "$params" | awk -F'|' '{print $4}')
+    cpu_cores=$(echo "$params" | awk -F'|' '{print $5}')
+    sound_device=$(echo "$params" | awk -F'|' '{print $6}')
+    efi=$(echo "$params" | awk -F'|' '{print $7}')
+    config_name=$(echo "$params" | awk -F'|' '{print $1}')
+    qemu_command=$(echo "$params" | awk -F'|' '{print $8}')
+}
+
+# Получение списка сохраненных конфигураций
+config_files=$(find "$CONFIG_DIR" -name "*.txt")
+
+# Если есть сохраненные конфигурации, показать окно выбора
+if [ -n "$config_files" ]; then
+    config_choice=$(yad --width=300 --height=200 --title="yQEMU" \
+    --text="<b>QEMU</b>" --image="qemu" \
+    --window-icon="qemu" --image-on-top \
+    --name="qemu" \
+    --fixed --image-on-top --center \
+        --list --column="Configuration" --column="Config File":HD \
+        --column="Parameters" \
+        $(for config_file in $config_files; do
+            config_name=$(basename "$config_file" .txt)
+	    load_config "$config_file"
+            echo "<b>$config_name</b> $config_file $iso_path;$qcow2_path"
+        done) \
+         --button="$gtk-execute":0  --button="$gtk-add":3 --button="$gtk-remove":2 --button="$gtk-settings":4 --button="$gtk-quit":1)
+#         --button="Run!gtk-media-play":4  --button="New!gtk-new":3 --button="Delete!gtk-delete":2 --button="$gtk-edit":0 --button="$gtk-cancel":1)
+    y="$?"
+        selected_config=$(echo "$config_choice" | awk -F'|' '{print $2}')
+    if [ $y -eq 4 ]; then
+        load_config "$selected_config"
+    elif [ $y -eq 0 ]; then
+        load_config "$selected_config"
+        # Запуск QEMU с полученными параметрами
+	run_qemu "$iso_path" "$qcow2_path" "$memory" "$cpu_cores" "$sound_device" "$efi" 
+    elif [ $y -eq 3 ]; then
+        load_config 
+    elif [ $y -eq 2 ]; then
+	rm "`echo "$config_choice" | awk -F'|' '{print $2}'`" ; exec "$0" ; exit
+    else
+        echo "Operation cancelled by user."
+        exit 1
+    fi
+else
+    # Если сохраненных конфигураций нет, использовать значения по умолчанию
+    def
+fi
+
+main(){
+[ "$selected_config" ] || selected_config="`date +%y%m%d-%H%M-%S`"
+# Получение параметров от пользователя с помощью yad
+params=$(yad --width=400 --height=300 --title="yQEMU" \
+    --text="<b>QEMU</b>" --image="qemu" \
+    --window-icon="qemu" \
+    --name="qemu" \
+    --fixed --image-on-top --center \
+    --form \
+    --field="Name":  \
+    --field="ISO Path":SFL \
+    --field="QCOW2 Path":SFL  \
+    --field="Memory (MB)":NUM \
+    --field="CPU Cores":NUM  \
+    --field="Sound":CB  \
+    --field="EFI":CHK  \
+    --field="Other":TXT  \
+    --field="QCOW2 create!gtk-new!":FBTN \
+    --Xbutton="MENU!gtk-index":3 --button="$gtk-save":2 \
+    --Xbutton="$gtk-ok":0 --Xbutton="!gtk-quit!Exit":1 --button="$gtk-cancel":1 \
+    "`basename "$selected_config" .txt`" \
+    "$iso_path" \
+    "$qcow2_path" \
+    "$memory"  \
+    "$cpu_cores" \
+    "$sound_device!!AC97-alsa!AC97-pulse!virtio-sound-pci-alsa!virtio-sound-pci-pulse" \
+    "$efi" \
+    "$qemu_command" \
+    "yqemu-img"  \
+    )
+y="$?"
+#echo $params  ;exit
+# Проверка, нажал ли пользователь "OK" или "Save"
+if [ $y -eq 0 ]; then
+    razb
+    # Сохранение конфигурации
+    config_file="$CONFIG_DIR/$config_name.txt"
+    save_config "$config_file" "$iso_path" "$qcow2_path" "$memory" "$cpu_cores" "$sound_device"  "$efi" "$qemu_command"
+    # Запуск QEMU с полученными параметрами
+    run_qemu "$iso_path" "$qcow2_path" "$memory" "$cpu_cores" "$sound_device" "$efi" 
+elif [ $y -eq 3 ]; then
+    exec "$0" ; exit
+elif [ $y -eq 2 ]; then
+    # Сохранение конфигурации
+    razb
+    config_file="$CONFIG_DIR/$config_name.txt"
+    save_config "$config_file" "$iso_path" "$qcow2_path" "$memory" "$cpu_cores" "$sound_device" "$efi" "$qemu_command"
+    echo "Configuration saved."
+        selected_config="$config_file"
+        #main ; 
+        exec $0 ;exit
+else
+    echo "Operation cancelled by user."
+    exit 1
+fi
+$0 &
+}
+main

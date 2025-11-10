@@ -1,0 +1,152 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=yQEMU
+GenericName=yQEMU
+Exec=yqemu
+Comment=QEMU GUI
+Icon=qemu
+Terminal=false
+StartupNotify=true
+Categories=System;
+X-AppStream-Ignore=true
+
+# Русский
+Name[ru]=yQEMU
+GenericName[ru]=Виртуализация QEMU
+Comment[ru]=Графический интерфейс для QEMU
+
+# Украинский
+Name[uk]=yQEMU
+GenericName[uk]=Віртуалізація QEMU
+Comment[uk]=Графічний інтерфейс для QEMU
+
+# Немецкий
+Name[de]=yQEMU
+GenericName[de]=QEMU Virtualisierung
+Comment[de]=Grafische Oberfläche für QEMU
+
+# Французский
+Name[fr]=yQEMU
+GenericName[fr]=Virtualisation QEMU
+Comment[fr]=Interface graphique pour QEMU
+
+# Испанский
+Name[es]=yQEMU
+GenericName[es]=Virtualización QEMU
+Comment[es]=Interfaz gráfica para QEMU
+
+# Итальянский
+Name[it]=yQEMU
+GenericName[it]=Virtualizzazione QEMU
+Comment[it]=Interfaccia grafica per QEMU
+
+# Португальский
+Name[pt]=yQEMU
+GenericName[pt]=Virtualização QEMU
+Comment[pt]=Interface gráfica para QEMU
+
+# Польский
+Name[pl]=yQEMU
+GenericName[pl]=Wirtualizacja QEMU
+Comment[pl]=Graficzny interfejs dla QEMU
+
+# Китайский упрощенный
+Name[zh_CN]=yQEMU
+GenericName[zh_CN]=QEMU 虚拟化
+Comment[zh_CN]=QEMU 图形界面
+
+# Китайский традиционный
+Name[zh_TW]=yQEMU
+GenericName[zh_TW]=QEMU 虛擬化
+Comment[zh_TW]=QEMU 圖形界面
+
+# Японский
+Name[ja]=yQEMU
+GenericName[ja]=QEMU仮想化
+Comment[ja]=QEMUグラフィカルインターフェース
+
+# Корейский
+Name[ko]=yQEMU
+GenericName[ko]=QEMU 가상화
+Comment[ko]=QEMU 그래픽 인터페이스
+
+# Арабский
+Name[ar]=yQEMU
+GenericName[ar]=افتراضي QEMU
+Comment[ar]=واجهة رسومية لـ QEMU
+
+# Турецкий
+Name[tr]=yQEMU
+GenericName[tr]=QEMU Sanallaştırma
+Comment[tr]=QEMU Grafik Arayüzü
+
+# Голландский
+Name[nl]=yQEMU
+GenericName[nl]=QEMU Virtualisatie
+Comment[nl]=Grafische interface voor QEMU
+
+# Шведский
+Name[sv]=yQEMU
+GenericName[sv]=QEMU Virtualisering
+Comment[sv]=Grafiskt gränssnitt för QEMU
+
+# Чешский
+Name[cs]=yQEMU
+GenericName[cs]=QEMU Virtualizace
+Comment[cs]=Grafické rozhraní pro QEMU
+
+# Венгерский
+Name[hu]=yQEMU
+GenericName[hu]=QEMU Virtualizálás
+Comment[hu]=Grafikus felület QEMU-hoz
+
+# Румынский
+Name[ro]=yQEMU
+GenericName[ro]=Virtualizare QEMU
+Comment[ro]=Interfață grafică pentru QEMU
+
+# Греческий
+Name[el]=yQEMU
+GenericName[el]=Εξομοίωση QEMU
+Comment[el]=Γραφική Διεπαφή για QEMU
+
+# Финский
+Name[fi]=yQEMU
+GenericName[fi]=QEMU Virtualisointi
+Comment[fi]=Graafinen käyttöliittymä QEMU:lle
+
+# Датский
+Name[da]=yQEMU
+GenericName[da]=QEMU Virtualisering
+Comment[da]=Grafisk grænseflade til QEMU
+
+# Норвежский
+Name[no]=yQEMU
+GenericName[no]=QEMU Virtualisering
+Comment[no]=Grafisk grensesnitt for QEMU
+
+# Хинди
+Name[hi]=yQEMU
+GenericName[hi]=QEMU वर्चुअलाइजेशन
+Comment[hi]=QEMU ग्राफिकल इंटरफेस
+
+# Персидский
+Name[fa]=yQEMU
+GenericName[fa]=مجازی سازی QEMU
+Comment[fa]=رابط گرافیکی برای QEMU
+
+# Иврит
+Name[he]=yQEMU
+GenericName[he]=וירטואליזציית QEMU
+Comment[he]=ממשק גרפי ל-QEMU
+
+# Тайский
+Name[th]=yQEMU
+GenericName[th]= virtualization QEMU
+Comment[th]=อินเทอร์เฟซกราฟิกสำหรับ QEMU
+
+# Вьетнамский
+Name[vi]=yQEMU
+GenericName[vi]=Ảo hóa QEMU
+Comment[vi]=Giao diện đồ họa cho QEMU
