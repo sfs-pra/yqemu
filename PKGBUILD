@@ -8,7 +8,7 @@ arch=('any')
 url="https://forum.puppyrus.org/index.php?topic=3840.msg189484#msg189484"
 license=('GPL3')
 depends=(
-yad
+yad-light
 gettext
 bash
 coreutils
