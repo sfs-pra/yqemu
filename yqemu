@@ -1,5 +1,5 @@
 #!/bin/bash
-#250514 sfs
+#251215 sfs
 # Директория для хранения конфигурационных файлов
 CONFIG_DIR="$HOME/.config/qemu-configs"
 yad --version |grep -E '^0' && gtk=gtk || gtk=yad
@@ -115,11 +115,11 @@ config_files=$(find "$CONFIG_DIR" -name "*.txt")
 
 # Если есть сохраненные конфигурации, показать окно выбора
 if [ -n "$config_files" ]; then
-    config_choice=$(yad --width=300 --height=200 --title="yQEMU" \
+    config_choice=$(yad --Xwidth=300 --height=400 --title="yQEMU" \
     --text="<b>QEMU</b>" --image="qemu" \
     --window-icon="qemu" --image-on-top \
     --name="qemu" \
-    --fixed --image-on-top --center \
+    --Xfixed --image-on-top --center \
         --list --column="Configuration" --column="Config File":HD \
         --column="Parameters" \
         $(for config_file in $config_files; do
@@ -190,8 +190,8 @@ if [ $y -eq 0 ]; then
     save_config "$config_file" "$iso_path" "$qcow2_path" "$memory" "$cpu_cores" "$sound_device"  "$efi" "$qemu_command"
     # Запуск QEMU с полученными параметрами
     run_qemu "$iso_path" "$qcow2_path" "$memory" "$cpu_cores" "$sound_device" "$efi" 
-elif [ $y -eq 3 ]; then
-    exec "$0" ; exit
+elif [ $y -eq 1 ]; then
+    [ "$config_files" ] && { exec "$0" ; exit ; } || exit
 elif [ $y -eq 2 ]; then
     # Сохранение конфигурации
     razb

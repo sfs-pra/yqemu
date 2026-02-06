@@ -1,93 +1,115 @@
 #!/bin/bash
-#250428 sfs
-yad --version |grep -E '^0' && gtk=gtk || gtk=yad
+#260106 sfs
+yad --version |grep -E '^0' && export gtk=gtk || export gtk=yad
 
-# Функция для создания нового образа
+# Initialize gettext
+export TEXTDOMAIN=yqemu
+export TEXTDOMAINDIR=/usr/share/locale
+
+NTF(){
+    [ "$1" = "-i" ] && { notify-send -a mmod -i $2 "`printf "$3\n$4"`" ; return ; }
+    i="--image=gtk-info --button=$gtk-ok:0 --back=red" && col=green
+    [ "$1" = "-q" ] && i="--image=gtk-dialog-question --button=$gtk-yes:0 --button=$gtk-no" && col=black
+    [ "$1" = "-a" ] && i="--image=gtk-dialog-error --button=$gtk-ok:0" && col=red
+    tit="`echo $2 | sed 's/<[^>]*>//g'`"
+    yad --width=600 --form --fixed --name=gtk-info  \
+    --image-on-top $i  --mouse \
+    --window-icon=gtk-info --title="$tit" \
+    --text "<span color=\"$col\"><b>$2</b></span>\n<i>$3</i>"  >/dev/null && echo $? 
+}
+export -f NTF
+
+# Function to create new image
 create_image() {
-    local image_name=$(yad --entry --title="Создать образ" --name="qemu" --window-icon="qemu" --text="Введите имя образа:")
+    v=($(yad --form --title="`gettext "Create Image"`" --name="qemu" --window-icon="qemu" \
+     --width=400 \
+     --text="`gettext "Enter image name (with full path, without extension):"`" \
+    --field=:SFL "$HOME/" \
+    --Xbutton=yad-cancel:1 \
+    --Xbutton=yad-ok:0 \
+    ))
+ret=$?
+[ ! $ret -eq 0 ] && return
     if [ -z "$image_name" ]; then
-        yad --info --text="Имя образа не может быть пустым."
+        NTF -a "`gettext "Image name cannot be empty."`"
         return
     fi
 
-    local image_size=$(yad --entry --title="Создать образ .qcow2" --name="qemu" --window-icon="qemu" --text="Введите размер образа (например, 10G):")
-#"
+    local image_size=$(yad --entry --title="`gettext "Create .qcow2 Image"`" --name="qemu" --window-icon="qemu" --text="`gettext "Enter image size (e.g., 10G):"`")
     if [ -z "$image_size" ]; then
-        yad --info --text="Размер образа не может быть пустым."
+        NTF -a "`gettext "Image size cannot be empty."`"
         return
     fi
 
     qemu-img create -f qcow2 "$image_name".qcow2 "$image_size"
     if [ $? -eq 0 ]; then
-        yad --name="qemu" --window-icon="qemu" --info --text="Образ `pwd`$image_name.qcow2 создан успешно."
+        yad --name="qemu" --window-icon="qemu" --info --text="`gettext "Image $image_name.qcow2 created successfully."`"
     else
-        yad --name="qemu" --window-icon="qemu" --info --text="Ошибка при создании образа."
+        yad --name="qemu" --window-icon="qemu" --info --text="`gettext "Error creating image."`"
     fi
 }
 export -f create_image
 
-# Функция для конвертации образа
+# Function to convert image
 convert_image() {
-    local source_image=$(yad --file --title="Выберите исходный образ" --name="qemu" --window-icon="qemu")
+    local source_image=$(yad --file --title="`gettext "Select Source Image"`" --name="qemu" --window-icon="qemu")
     if [ -z "$source_image" ]; then
-        yad --name="qemu" --window-icon="qemu" --info --text="Исходный образ не выбран."
+        yad --name="qemu" --window-icon="qemu" --info --text="`gettext "Source image not selected."`"
         return
     fi
 
-    local destination_image=$(yad --entry --title="Конвертировать образ" --text="Введите имя нового образа:")
+    local destination_image=$(yad --entry --title="`gettext "Convert Image"`" --text="`gettext "Enter new image name:"`")
     if [ -z "$destination_image" ]; then
-        yad --name="qemu" --window-icon="qemu" --info --text="Имя нового образа не может быть пустым."
+        yad --name="qemu" --window-icon="qemu" --info --text="`gettext "New image name cannot be empty."`"
         return
     fi
 
     qemu-img convert -f qcow2 -O qcow2 "$source_image" "$destination_image"
     if [ $? -eq 0 ]; then
-        yad --name="qemu" --window-icon="qemu" --info --text="Образ $source_image конвертирован в $destination_image."
+        yad --name="qemu" --window-icon="qemu" --info --text="`gettext "Image $source_image converted to $destination_image."`"
     else
-        yad --name="qemu" --window-icon="qemu" --info --text="Ошибка при конвертации образа."
+        yad --name="qemu" --window-icon="qemu" --info --text="`gettext "Error converting image."`"
     fi
 }
 export -f convert_image
 
 rm_image() {
-    local source_image=$(yad --file --title="Выберите образ" --name="qemu" --window-icon="qemu")
+    local source_image=$(yad --file --title="`gettext "Select Image"`" --name="qemu" --window-icon="qemu")
     if [ -z "$source_image" ]; then
-#        yad --name="qemu" --window-icon="qemu" --info --text="Образ не выбран."
         return
     fi
     rm "$source_image" 
     if [ $? -eq 0 ]; then
-        yad --name="qemu" --window-icon="qemu" --info --text="Образ $source_image удален."
+        yad --name="qemu" --window-icon="qemu" --info --text="`gettext "Image $source_image deleted."`"
     else
-        yad --name="qemu" --window-icon="qemu" --info --text="Ошибка при удалении образа."
+        yad --name="qemu" --window-icon="qemu" --info --text="`gettext "Error deleting image."`"
     fi
 }
 export -f rm_image
 
-# Функция для получения информации об образе
+# Function to get image information
 info_image() {
-    local image_name=$(yad --file --title="Выберите образ")
+    local image_name=$(yad  --name="qemu" --window-icon="qemu" --file --title="`gettext "Select Image"`")
     if [ -z "$image_name" ]; then
-#        yad --info --text="Образ не выбран."
         return
     fi
 
     local image_info=$(qemu-img info "$image_name")
     if [ $? -eq 0 ]; then
-        yad --name="qemu" --fixed --window-icon="qemu" --title="Информация о $image_name" --fontname="mono" --width=600 --height=400 --text="$image_info"
+        yad --name="qemu" --fixed --window-icon="qemu" --title="`gettext "Information about $image_name"`" --fontname="mono" --width=600 --height=400 --text="$image_info"
     else
-        yad --name="qemu" --window-icon="qemu" --info --text="Ошибка при получении информации."
+        yad --name="qemu" --window-icon="qemu" --info --text="`gettext "Error getting information."`"
     fi
 }
 export -f info_image
-# Основной цикл интерфейса
+
+# Main interface loop
 while true; do
-#    action=$(yad --form --title="QEMU-IMG GUI" --width=300 --height=200 -- \
-    action=$(yad --name="qemu" --window-icon="qemu" --form --title="QEMU-IMG GUI" --width=300 --height=100  \
-	--text="<b>Имидж HDD qcow2</b>" --image="gtk-harddisk" --image-on-top \
-        --field="Создать!gtk-new!":fbtn "bash -c create_image" \
-        --field="Удалить!gtk-delete!":fbtn "bash -c rm_image" \
-        --field="Информация!gtk-info!":fbtn "bash -c info_image" \
+    action=$(yad --name="qemu" --window-icon="qemu" --form --title="yQEMU-img" --width=300 --height=100  \
+	--text="`gettext "<b>qcow2 HDD Image</b>"`" --image="gtk-harddisk" --image-on-top \
+        --field="`gettext "Create"`!gtk-new!":fbtn "bash -c create_image" \
+        --field="`gettext "Delete"`!gtk-delete!":fbtn "bash -c rm_image" \
+        --field="`gettext "Information"`!gtk-info!":fbtn "bash -c info_image" \
         --Xbutton=$gtk-ok:0 --button=$gtk-cancel:1)
 
     if [ $? -eq 1 ]; then
@@ -99,6 +121,6 @@ while true; do
         convert_image) convert_image ;;
         info_image) info_image ;;
         exit) break ;;
-        *) yad --name="qemu" --window-icon="qemu" --info --text="Неизвестное действие." ;;
+        *) yad --name="qemu" --window-icon="qemu" --info --text="`gettext "Unknown action."`" ;;
     esac
 done
