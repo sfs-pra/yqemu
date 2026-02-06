@@ -21,15 +21,15 @@ export -f NTF
 
 # Function to create new image
 create_image() {
-    v=($(yad --form --title="`gettext "Create Image"`" --name="qemu" --window-icon="qemu" \
-     --width=400 \
+    image_name=($(yad --form --title="`gettext "Create Image"`" --name="qemu" --window-icon="qemu" \
+     --width=400 --separator= \
      --text="`gettext "Enter image name (with full path, without extension):"`" \
     --field=:SFL "$HOME/" \
     --Xbutton=yad-cancel:1 \
     --Xbutton=yad-ok:0 \
     ))
-ret=$?
-[ ! $ret -eq 0 ] && return
+#ret=$?
+#[ "$v" ] || return
     if [ -z "$image_name" ]; then
         NTF -a "`gettext "Image name cannot be empty."`"
         return
